@@ -1,0 +1,39 @@
+# ══════════════════════════════════════════════════════════
+#  Projet 28 — Parameter Server
+#  Docker Compose
+#
+#  Auteurs : Anas ELAYATTI & Steven KABRE
+#  EMSI Marrakech — IIR S7 — 2024/2025
+# ══════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+
+  # ── Entrainement principal ──────────────────────────────
+  train:
+    build: .
+    container_name: parameter_server_train
+    command: python src/train.py
+    volumes:
+      - ./resultats:/app/resultats   # Les graphiques apparaissent sur ton PC
+    environment:
+      - PYTHONUNBUFFERED=1           # Voir les logs en temps reel
+
+  # ── Tests unitaires ─────────────────────────────────────
+  tests:
+    build: .
+    container_name: parameter_server_tests
+    command: python tests/test_parameter_server.py
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  # ── Simulation de pannes ────────────────────────────────
+  fault:
+    build: .
+    container_name: parameter_server_fault
+    command: python src/fault_simulation.py
+    volumes:
+      - ./resultats:/app/resultats
+    environment:
+      - PYTHONUNBUFFERED=1

@@ -27,50 +27,71 @@ parameter-server/
 ├── resultats/                # Graphiques générés automatiquement
 ├── tests/
 │   └── test_parameter_server.py
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
 └── README.md
 ```
 
-## Installation
+---
+
+## Lancement avec Docker (recommandé)
+
+### Prérequis
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installé
+
+### Commandes
+
+```bash
+# 1. Construire l'image Docker
+docker build -t parameter-server .
+
+# 2. Lancer l'entraînement
+docker run --rm -v $(pwd)/resultats:/app/resultats parameter-server
+
+# 3. Lancer les tests
+docker run --rm parameter-server python tests/test_parameter_server.py
+
+# 4. Lancer la simulation de pannes
+docker run --rm -v $(pwd)/resultats:/app/resultats parameter-server python src/fault_simulation.py
+```
+
+### Avec Docker Compose (encore plus simple)
+
+```bash
+# Entraînement
+docker-compose run train
+
+# Tests
+docker-compose run tests
+
+# Simulation de pannes
+docker-compose run fault
+```
+
+---
+
+## Lancement sans Docker
 
 ```bash
 pip install -r requirements.txt
-```
-
-## Utilisation
-
-```bash
-# Lancer l'entraînement
 python src/train.py
-
-# Simuler des pannes
+python tests/test_parameter_server.py
 python src/fault_simulation.py
 ```
 
-## Paramètres configurables
-
-| Paramètre | Défaut | Description |
-|-----------|--------|-------------|
-| `n_workers` | 3 | Nombre de workers parallèles |
-| `n_epochs` | 15 | Nombre d'époques |
-| `batch_size` | 32 | Taille du mini-batch |
-| `lr` | 0.05 | Taux d'apprentissage (alpha) |
+---
 
 ## Résultats
 
 | Métrique | Valeur |
 |----------|--------|
-| Précision finale | 94.5% |
+| Précision finale | 94.4% |
 | Version du modèle | v720 |
 | Gradients par worker | 240 |
 | Temps d'entraînement | ~0.9s |
 
-## Concepts clés
-
-- **Asynchronisme (ASP)** : aucun worker n'attend les autres
-- **Staleness** : décalage entre version locale et version serveur
-- **Thread-safety** : `threading.Lock()` protège les mises à jour
-- **Théorème CAP** : système AP — Disponibilité + Tolérance aux partitions
+---
 
 ## Réalisé par
 
